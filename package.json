@@ -1,36 +1,54 @@
 {
   "name": "secure-apns-sender",
   "version": "1.0.0",
-  "description": "Secure Apple Push Notification Service (APNs) sender for Node.js with path traversal protection",
-  "main": "push-notification-sender.js",
+  "description": "Secure Apple Push Notification Service (APNs) sender for Node.js with path traversal protection and enhanced security features",
+  "main": "index.js",
+  "types": "index.d.ts",
   "bin": {
     "apns": "./bin/secure-apns-sender"
   },
   "scripts": {
     "test": "node test/test.js",
+    "test:verbose": "NODE_ENV=development node test/test.js",
     "example": "node examples/example.js",
-    "prepare": "npm test",
-    "prepublishOnly": "npm test"
+    "lint": "echo 'Linting...' && node -c lib/PushNotificationSender.js",
+    "validate": "npm run lint && npm test",
+    "prepare": "npm run validate",
+    "prepublishOnly": "npm run validate && npm audit",
+    "postinstall": "echo 'secure-apns-sender installed successfully! Use: npx secure-apns --help'"
   },
   "keywords": [
-    "push",
-    "notification",
+    "push-notification",
     "apns",
+    "apple-push-notification",
+    "ios-push",
+    "push-service",
+    "mobile-notifications",
     "apple",
     "ios",
     "ipad",
     "iphone",
-    "mobile",
+    "nodejs",
     "secure",
     "path-traversal-protection",
-    "nodejs",
-    "npm-package"
+    "security",
+    "authentication",
+    "jwt-token",
+    "p8-certificate",
+    "mobile-development"
   ],
-  "author": "Onat Varis <onatvaris@gmail.com>",
+  "author": {
+    "name": "Onat Varis",
+    "email": "onatvaris@gmail.com",
+    "url": "https://github.com/onatvaris"
+  },
   "license": "MIT",
   "dependencies": {
     "apn": "^2.2.0"
   },
+  "devDependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/onatvaris/secure-apns-sender.git"
@@ -40,14 +58,34 @@
   },
   "homepage": "https://github.com/onatvaris/secure-apns-sender#readme",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
   },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
   "files": [
     "lib/",
     "bin/",
-    "push-notification-sender.js",
+    "index.js",
+    "index.d.ts",
     "README.md",
     "LICENSE",
     "SECURITY.md"
-  ]
+  ],
+  "directories": {
+    "lib": "./lib",
+    "test": "./test",
+    "example": "./examples"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/onatvaris"
+  }
 }
