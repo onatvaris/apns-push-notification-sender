@@ -17,7 +17,7 @@ MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgSkfqXty
 -----END PRIVATE KEY-----`;
 
 function runTests() {
-  console.log('🧪 Secure APNs Sender Tests\n');
+  console.log('🧪 APNs Push Notification Sender Tests\n');
   
   // Test 1: Configuration validation
   console.log('📋 Test 1: Configuration validation');

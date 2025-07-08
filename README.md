@@ -1,11 +1,11 @@
-# Secure APNs Sender
+# APNs Push Notification Sender
 
 Secure and easy-to-use Node.js package for Apple Push Notification Service (APNs).
 
 ## 📦 Installation
 
 ```bash
-npm install secure-apns-sender
+npm install apns-push-notification-sender
 ```
 
 ## 🚀 Quick Start
@@ -57,7 +57,7 @@ Create a `payload.json` file:
 ### 2. Programmatic Usage
 
 ```javascript
-const PushNotificationSender = require('secure-apns-sender');
+const PushNotificationSender = require('apns-push-notification-sender');
 const fs = require('fs');
 
 // Load from configuration file

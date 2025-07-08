@@ -1,5 +1,5 @@
 {
-  "name": "secure-apns-sender",
+  "name": "apns-push-notification-sender",
   "version": "1.0.0",
   "description": "Secure Apple Push Notification Service (APNs) sender for Node.js with path traversal protection and enhanced security features",
   "main": "index.js",
@@ -14,8 +14,8 @@
     "lint": "echo 'Linting...' && node -c lib/PushNotificationSender.js",
     "validate": "npm run lint && npm test",
     "prepare": "npm run validate",
-    "prepublishOnly": "npm run validate && npm audit",
-    "postinstall": "echo 'secure-apns-sender installed successfully! Use: npx secure-apns --help'"
+    "prepublishOnly": "npm run validate",
+    "postinstall": "echo 'apns-push-notification-sender installed successfully! Use: npx apns --help'"
   },
   "keywords": [
     "push-notification",
@@ -44,19 +44,16 @@
   },
   "license": "MIT",
   "dependencies": {
-    "apn": "^2.2.0"
+    "apn": "^2.0.0"
   },
-  "devDependencies": {},
-  "peerDependencies": {},
-  "optionalDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/onatvaris/secure-apns-sender.git"
+    "url": "git+https://github.com/onatvaris/apns-push-notification-sender.git"
   },
   "bugs": {
-    "url": "https://github.com/onatvaris/secure-apns-sender/issues"
+    "url": "https://github.com/onatvaris/apns-push-notification-sender/issues"
   },
-  "homepage": "https://github.com/onatvaris/secure-apns-sender#readme",
+  "homepage": "https://github.com/onatvaris/apns-push-notification-sender#readme",
   "engines": {
     "node": ">=14.0.0",
     "npm": ">=6.0.0"
