@@ -1,0 +1,53 @@
+{
+  "name": "secure-apns-sender",
+  "version": "1.0.0",
+  "description": "Secure Apple Push Notification Service (APNs) sender for Node.js with path traversal protection",
+  "main": "push-notification-sender.js",
+  "bin": {
+    "apns": "./bin/secure-apns-sender"
+  },
+  "scripts": {
+    "test": "node test/test.js",
+    "example": "node examples/example.js",
+    "prepare": "npm test",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "push",
+    "notification",
+    "apns",
+    "apple",
+    "ios",
+    "ipad",
+    "iphone",
+    "mobile",
+    "secure",
+    "path-traversal-protection",
+    "nodejs",
+    "npm-package"
+  ],
+  "author": "Onat Varis <onatvaris@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "apn": "^2.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onatvaris/secure-apns-sender.git"
+  },
+  "bugs": {
+    "url": "https://github.com/onatvaris/secure-apns-sender/issues"
+  },
+  "homepage": "https://github.com/onatvaris/secure-apns-sender#readme",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "files": [
+    "lib/",
+    "bin/",
+    "push-notification-sender.js",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ]
+}

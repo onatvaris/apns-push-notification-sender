@@ -1,0 +1,217 @@
+#!/usr/bin/env node
+
+const PushNotificationSender = require('../push-notification-sender');
+const path = require('path');
+const fs = require('fs');
+
+function showHelp() {
+  console.log(`
+Secure APNs Sender CLI
+
+Usage:
+  apns --config <config-file> --payload <payload-file> [options]
+
+Options:
+  --config, -c     Configuration file path (JSON format)
+  --payload, -p    Payload file path (JSON format)
+  --message, -m    Notification message (overrides TextMessage in payload)
+  --title, -t      Notification title
+  --badge, -b      Badge count (default: 1)
+  --sound, -s      Sound file (default: ping.aiff)
+  --help, -h       Show this help message
+
+Examples:
+  apns --config ./push-config.json --payload ./payload.json
+  apns -c ./push-config.json -p ./payload.json -m "Test message"
+  apns -c ./push-config.json -p ./payload.json -m "Hello!" -t "New Message" -b 5
+  `);
+}
+
+function parseArgs(args) {
+  const options = {};
+  
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    
+    switch (arg) {
+      case '--config':
+      case '-c':
+        options.config = args[++i];
+        break;
+      case '--payload':
+      case '-p':
+        options.payload = args[++i];
+        break;
+      case '--message':
+      case '-m':
+        options.message = args[++i];
+        break;
+      case '--title':
+      case '-t':
+        options.title = args[++i];
+        break;
+      case '--badge':
+      case '-b':
+        options.badge = parseInt(args[++i], 10);
+        break;
+      case '--sound':
+      case '-s':
+        options.sound = args[++i];
+        break;
+      case '--help':
+      case '-h':
+        showHelp();
+        process.exit(0);
+        break;
+    }
+  }
+  
+  return options;
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  
+  if (args.length === 0) {
+    showHelp();
+    process.exit(1);
+  }
+  
+  const options = parseArgs(args);
+  
+  if (!options.config) {
+    console.error('❌ Configuration file not specified. Use --config option.');
+    process.exit(1);
+  }
+  
+  if (!options.payload) {
+    console.error('❌ Payload file not specified. Use --payload option.');
+    process.exit(1);
+  }
+  
+  try {
+    console.log('🔧 Loading configuration...');
+    const sender = PushNotificationSender.createFromConfigFile(options.config);
+    
+    console.log('✅ Configuration loaded.');
+    
+    // Load payload file securely
+    console.log('📄 Loading payload file...');
+    
+    // Secure file path validation
+    let payloadPath;
+    try {
+      payloadPath = path.resolve(options.payload);
+      const normalizedPath = path.normalize(payloadPath);
+      
+      // Path traversal check
+      if (normalizedPath.includes('..')) {
+        console.error('❌ Security risk: Path traversal detected');
+        process.exit(1);
+      }
+      
+      // Only allow .json files
+      if (path.extname(normalizedPath).toLowerCase() !== '.json') {
+        console.error('❌ Only .json files are allowed');
+        process.exit(1);
+      }
+      
+    } catch (error) {
+      console.error('❌ Invalid file path');
+      process.exit(1);
+    }
+    
+    if (!fs.existsSync(payloadPath)) {
+      console.error('❌ Payload file not found');
+      process.exit(1);
+    }
+    
+    const payloadContent = fs.readFileSync(payloadPath, 'utf8');
+    let payload;
+    
+    try {
+      // Check JSON size (max 1MB)
+      if (payloadContent.length > 1024 * 1024) {
+        console.error('❌ Payload file too large (max 1MB)');
+        process.exit(1);
+      }
+      
+      payload = JSON.parse(payloadContent);
+      
+      // Validate payload structure
+      if (!payload || typeof payload !== 'object') {
+        console.error('❌ Payload is not a valid JSON object');
+        process.exit(1);
+      }
+      
+    } catch (parseError) {
+      console.error('❌ Payload file is not in valid JSON format');
+      process.exit(1);
+    }
+    
+    console.log('✅ Payload loaded.');
+    
+    // If message is provided via CLI, override TextMessage in payload
+    if (options.message && payload.PostPushResult && payload.PostPushResult.length > 0) {
+      payload.PostPushResult.forEach(item => {
+        item.TextMessage = options.message;
+      });
+    }
+    
+    // Dynamic date and transaction ID update
+    if (payload.PostPushResult && payload.PostPushResult.length > 0) {
+      const now = new Date().toISOString();
+      payload.PostPushResult.forEach(item => {
+        item.Created = now;
+        item.TakenForSent = now;
+        item.DsLastChange = now;
+      });
+      payload.TransactionId = Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
+    
+    const notificationOptions = {
+      alert: options.message || (payload.PostPushResult && payload.PostPushResult[0] ? payload.PostPushResult[0].TextMessage : "Push Notification"),
+      badge: options.badge || 1,
+      sound: options.sound || "ping.aiff"
+    };
+    
+    if (options.title) {
+      notificationOptions.alert = {
+        title: options.title,
+        body: options.message || (payload.PostPushResult && payload.PostPushResult[0] ? payload.PostPushResult[0].TextMessage : "Push Notification")
+      };
+    }
+    
+    console.log('📱 Sending push notification...');
+    
+    const result = await sender.sendNotification(payload, notificationOptions);
+    
+    if (result.success) {
+      console.log('✅ Push notification sent successfully!');
+      console.log(`📊 Sent: ${result.sent.length}, Failed: ${result.failed.length}`);
+      process.exit(0);
+    } else {
+      console.log('❌ Push notification could not be sent.');
+      if (result.failed.length > 0) {
+        console.log('Errors:', result.failed);
+      }
+      process.exit(1);
+    }
+    
+  } catch (error) {
+    // Security: Hide detailed error messages
+    console.error('❌ Operation failed');
+    
+    // Show detailed error only in development mode
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Detailed error:', error.message);
+    }
+    
+    process.exit(1);
+  }
+}
+
+main().catch((error) => {
+  console.error('❌ Critical error:', error.message);
+  process.exit(1);
+});

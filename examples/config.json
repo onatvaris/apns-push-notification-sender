@@ -1,0 +1,8 @@
+{
+  "keyId": "YOUR_KEY_ID_HERE",
+  "teamId": "YOUR_TEAM_ID_HERE",
+  "bundleId": "com.yourcompany.yourapp",
+  "deviceToken": "your-device-token-here",
+  "keyPath": "path/to/your/AuthKey_XXXXXXXXXX.p8",
+  "production": false
+}
